@@ -1,0 +1,222 @@
+{
+  "name": "Computer Store AI agent",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=You represent a computer store. Please answer customer inquiries using the information provided in the Google Sheet. Please send an email to the owner only if the customer requests to purchase a device. Before sending the email, ask the customer for their name and phone number, and send them to the owner via Email. Please arrange the email in a very well format\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [-48, -64],
+      "id": "50986c6f-cf53-4aca-8b22-d74e2b078ed5",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [-160, 144],
+      "id": "6247d3dc-e891-43fa-b177-8b86f7833c90",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "1068826113"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [-16, 160],
+      "id": "1fcd9505-f222-4316-9940-8ddcb33e9e19",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [-528, -64],
+      "id": "28da6441-1b1e-4c5a-80c0-867a228e16a7",
+      "name": "Telegram Trigger",
+      "webhookId": "9f2b3602-052a-458e-9964-eacfa6da3e5d"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [448, -64],
+      "id": "660a50da-05ac-4e16-8565-e1fcf29dedd6",
+      "name": "Send a text message",
+      "webhookId": "a0fa1807-9115-464c-a9a6-8a3f1e75a644"
+    },
+    {
+      "parameters": {
+        "sendTo": "ahmedmagdymorad7@gmail.com",
+        "subject": "Item Purchase Request",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [112, 144],
+      "id": "aa5e9763-d45a-4954-a6ba-af6f19cf789f",
+      "name": "Send a mail to the owner",
+      "webhookId": "6f3349bc-3bac-4160-a6ae-51663043ef79"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1i7qlnbCHXFdpGI0A4jS4dUFM4S628HC1E05TVpUt8Gw",
+          "mode": "list",
+          "cachedResultName": "Computer Company Product",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1i7qlnbCHXFdpGI0A4jS4dUFM4S628HC1E05TVpUt8Gw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1i7qlnbCHXFdpGI0A4jS4dUFM4S628HC1E05TVpUt8Gw/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [240, 96],
+      "id": "256d1ccb-4b27-4d76-a6f6-34579c620eeb",
+      "name": "Get Store Items Data"
+    },
+    {
+      "parameters": {
+        "content": "User Start talking to the bot\n",
+        "height": 224,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-608, -128],
+      "id": "60be36d7-45a8-455f-b9d3-14fee42e161c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "Ai agent\nAnswer the user with the information in the store sheet.\nSend email to the store owner when the user confirm the purchese process.",
+        "height": 448,
+        "width": 624
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-256, -176],
+      "id": "94832950-171f-4da9-89db-8c80215f7058",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a mail to the owner": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Store Items Data": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "43a67f1c-3f4d-4704-a7d6-d2d2b15ad3b9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ea49b237d7acc95adbb2dfb8f1e4da9c9ca17a20b27bf013a4f5bb5462606b8a"
+  },
+  "id": "yIDHfXjL0g9FtFw7",
+  "tags": [
+    {
+      "updatedAt": "2026-03-14T15:54:18.329Z",
+      "createdAt": "2026-03-14T15:54:18.329Z",
+      "id": "GMAyGi8nlKrPj2Od",
+      "name": "learning"
+    }
+  ]
+}
